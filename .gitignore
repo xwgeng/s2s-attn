@@ -1,6 +1,6 @@
 *.swp
-log/*
-data/nmt/*
+/log/*
 /backup/nmt/*
 /output/nmt/*
+/data/nmt/*
 /script/mosesdecoder
