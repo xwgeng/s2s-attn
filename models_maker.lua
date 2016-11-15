@@ -7,57 +7,6 @@ local recurrent = require 'recurrent'
 
 local models = {}
 
-function models.decoder_rnn_attn(opt)
-	local inputs = {}
-	table.insert(inputs, nn.Identity()())
-	table.insert(inputs, nn.Identity()()) -- context
-
-	local outputs = {}
-
-	local n = opt.nlayer + 1
-	if opt.rnn == 'lstm' then n = n + opt.nlayer end
-	local input = {inputs[1]:split(n)}
-	local x = input[1]
-	local prev_top_h = input[#input]
-	local prev_top_c = nil
-	if opt.rnn == 'lstm' then prev_top_c = input[#input - 1] end
-
-	local attn_h = nn.CAddTable(){
-		nn.Linear(opt.emb, opt.dec_rnn_size)(x),
-		nn.Linear(opt.dec_rnn_size, opt.dec_rnn_size)(prev_top_h),
-		prev_top_c and nn.Linear(opt.dec_rnn_size, opt.dec_rnn_size)(prev_top_c)
-	}
-
-	local attention = nil
-	if opt.attn_net == 'conv' then
-		attention = models.decoder_conv_attn(opt)
-	else
-		attention = models.decoder_mlp_attn(opt)
-	end
-
-	local attn = attention({attn_h, inputs[2]}):annotate{name='attn'}
-	 
-	table.insert(input, attn) 
-	local rnn = recurrent[opt.rnn](
-		opt.emb, opt.dec_rnn_size, opt.nlayer, opt.dropout, false, opt.enc_rnn_size
-	)
-	local out = rnn(input):annotate{name='rnn'}
-	table.insert(outputs, out)
-	
-	local top_h = nn.SelectTable(-1)(out)
-	top_h = nn.JoinTable(2)({top_h, attn})
-	top_h = nn.Linear(
-		opt.enc_rnn_size + opt.dec_rnn_size, opt.dec_rnn_size, false
-	)(top_h)
-	top_h = nn.Tanh()(top_h)
-	if opt.dropout > 0 then top_h = nn.Dropout(opt.dropout)(top_h) end
-	local proj = nn.Linear(opt.dec_rnn_size, opt.tgt_vocab)(top_h)
-	local logsoft = nn.LogSoftMax()(proj)
-	table.insert(outputs, logsoft)
-
-	return nn.gModule(inputs, outputs)
-end
-
 function models.decoder_lstm_attn(opt)
 	local inputs = {}
 	table.insert(inputs, nn.Identity()())
