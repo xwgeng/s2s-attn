@@ -299,7 +299,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		end
 		
 		enc_lookup:backward({src, pos}, enc_dreps)
-		-- self.grad_params:div(tgt_len)
+		self.grad_params:div(tgt_len)
 		self.grad_params:clamp(-opt.grad_clip, opt.grad_clip)
 		
 		return loss, self.grad_params 
