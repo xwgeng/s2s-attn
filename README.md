@@ -43,7 +43,7 @@ This will run the model, which uses convolutional attentive encoder and a 1-laye
 
 * Given a trained model, use beam search to obtain the output. Additionally, greedy search is also provided for efficiency. To do this, just run as follows:
 ```
-th evluate.lua -search 'greedy' -batch_size 32
+th evaluate.lua -search 'greedy' -batch_size 32
 ```
 
 * I use the `muti-bleu.perl` script from Moses to compute the BLEU. Given the *identifier* of model, just run as follows:
