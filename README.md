@@ -6,7 +6,7 @@ the convolutional attentive encoder is also implemented.
 
 ### Dependencies
 
-## lua
+#### lua
 *moses
 *penlight
 
