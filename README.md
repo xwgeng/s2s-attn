@@ -6,18 +6,18 @@ the convolutional attentive encoder is also implemented.
 
 ### Dependencies
 
-#### lua
-*moses
-*penlight
+#### Lua
+* moses
+* penlight
 
-####torch
+#### Torch
 The model is implemented by [torch](http://torch.ch). It requires the following packages:
-*torch7
-*nn
-*nngraph
-*cutorch
-*cunn
-*paths
+* torch7
+* nn
+* nngraph
+* cutorch
+* cunn
+* paths
 
 
 
