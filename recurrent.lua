@@ -1,7 +1,6 @@
 local recurrent = {}
 
-function recurrent.lstm(
-	input_size, rnn_size, n, dropout, output_size, context_size)
+function recurrent.lstm(input_size, rnn_size, n, dropout, output_size)
   dropout = dropout or 0 
 
   -- there will be 2*n+1 inputs
@@ -10,12 +9,6 @@ function recurrent.lstm(
   for L = 1,n do
     table.insert(inputs, nn.Identity()()) -- prev_c[L]
     table.insert(inputs, nn.Identity()()) -- prev_h[L]
-  end
-
-  local context = nil
-  if context_size then
-	  table.insert(inputs, nn.Identity()())
-	  context = inputs[#inputs]
   end
 
   local x, input_size_L
@@ -36,14 +29,8 @@ function recurrent.lstm(
     -- evaluate the input sums at once for efficiency
     local i2h = nn.Linear(input_size_L, 4 * rnn_size)(x):annotate{name='i2h_'..L}
     local h2h = nn.Linear(rnn_size, 4 * rnn_size)(prev_h):annotate{name='h2h_'..L}
-    local c2h = nil
-	if context_size and L == n then
-		c2h = nn.Linear(context_size, 4 * rnn_size)(context):annotate{name='c2h_'..L}
-	end
 
-    local all_input_sums = nn.CAddTable()(
-		not (context_size and L == n) and {i2h, h2h} or {i2h, h2h, c2h}
-	)
+    local all_input_sums = nn.CAddTable()({i2h, h2h})
 
     local reshaped = nn.Reshape(4, rnn_size)(all_input_sums)
     local n1, n2, n3, n4 = nn.SplitTable(2)(reshaped):split(4)
@@ -76,8 +63,7 @@ function recurrent.lstm(
   return nn.gModule(inputs, outputs)
 end
 
-function recurrent.gru(
-	input_size, rnn_size, n, dropout, output_size, context_size)
+function recurrent.gru(input_size, rnn_size, n, dropout, output_size)
   dropout = dropout or 0 
   -- there are n+1 inputs (hiddens on each layer and x)
   local inputs = {}
@@ -86,17 +72,10 @@ function recurrent.gru(
     table.insert(inputs, nn.Identity()()) -- prev_h[L]
   end
 
-  local context = nil
-  if context_size then
-	  table.insert(inputs, nn.Identity()())
-  end
-
-  function new_input_sum(insize, xv, hv, cv)
+  function new_input_sum(insize, xv, hv)
     local i2h = nn.Linear(insize, rnn_size)(xv)
     local h2h = nn.Linear(rnn_size, rnn_size)(hv)
-	local c2h = nil
-	if cv then c2h = nn.Linear(context_size, rnn_size)(cv) end
-    return nn.CAddTable()(cv and {i2h, h2h, c2h} or {i2h, h2h})
+    return nn.CAddTable()({i2h, h2h})
   end
 
 
@@ -115,15 +94,13 @@ function recurrent.gru(
       input_size_L = rnn_size
     end
 
-	if L == n and context_size then context = inputs[#inputs] end
-
     -- GRU tick
     -- forward the update and reset gates
     local update_gate = nn.Sigmoid()(
-		new_input_sum(input_size_L, x, prev_h, context)
+		new_input_sum(input_size_L, x, prev_h)
 	)
     local reset_gate = nn.Sigmoid()(
-		new_input_sum(input_size_L, x, prev_h, context)
+		new_input_sum(input_size_L, x, prev_h)
 	)
     -- compute candidate hidden state
     local gated_hidden = nn.CMulTable()({reset_gate, prev_h})
@@ -146,25 +123,15 @@ function recurrent.gru(
 	table.insert(outputs, logsoft)
   end
 
-nngraph.annotateNodes()
-	nngraph.setDebug(false)
   return nn.gModule(inputs, outputs)
 end
 
-function recurrent.rnn(
-	input_size, rnn_size, n, dropout, output_size, context_size)
-  
+function recurrent.rnn(input_size, rnn_size, n, dropout, output_size)
   -- there are n+1 inputs (hiddens on each layer and x)
   local inputs = {}
   table.insert(inputs, nn.Identity()()) -- x
   for L = 1,n do
     table.insert(inputs, nn.Identity()()) -- prev_h[L]
-  end
-
-  local context = nil
-  if context_size then
-	table.insert(inputs, nn.Identity()())
-	context = inputs[#inputs]
   end
 
   local x, input_size_L
@@ -184,11 +151,7 @@ function recurrent.rnn(
     -- RNN tick
     local i2h = nn.Linear(input_size_L, rnn_size)(x)
     local h2h = nn.Linear(rnn_size, rnn_size)(prev_h)
-	local c2h = nil
-	if L == n and context_size then
-		c2h = nn.Linear(context_size, rnn_size)(context)
-	end
-    local next_h = nn.Tanh()(nn.CAddTable(){i2h, h2h, c2h})
+    local next_h = nn.Tanh()(nn.CAddTable(){i2h, h2h})
 
     table.insert(outputs, next_h)
   end
