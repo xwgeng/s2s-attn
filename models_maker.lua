@@ -188,7 +188,7 @@ function models.decoder_conv_attn(opt)
 	conv:add(nn.View(1, -1, opt.enc_rnn_size):setNumInputDims(2))
 	conv:add(nn.SpatialZeroPadding(0, 0, (opt.pool - 1) / 2, (opt.pool - 1) / 2))
 	conv:add(nn.SpatialAveragePooling(1, opt.pool))
-	conv:add(nn.View(-1, opt.enc_rnn_size):setNumInputDims(2))
+	conv:add(nn.View(-1, opt.enc_rnn_size):setNumInputDims(3))
 
 	local context = inputs[2]
 	conv_con = conv(context)
