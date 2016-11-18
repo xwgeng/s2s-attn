@@ -89,6 +89,10 @@ function Trainer:run(train, valid, opt)
 	local shrink_factor = opt.shrink_factor
 	local shrink_multiplier = opt.shrink_multiplier
 
+	if not paths.dirp(opt.save) then
+		os.execute('mkdir -p ' .. opt.save)
+	end
+
 	local timer = torch.Timer()
 
 	for i = 1, opt.nepoch do

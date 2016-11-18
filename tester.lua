@@ -92,6 +92,10 @@ function Tester:run(test, opt)
 	end
 	test:reset()
 
+	if not paths.dirp(opt.output) then
+		os.execute('mkdir -p ' .. opt.output)
+	end
+	
 	local timer = torch.Timer()
 	local score, nbOfwords = self:test(test, opt)
 	print(string.format(
