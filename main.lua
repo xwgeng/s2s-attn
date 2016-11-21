@@ -39,7 +39,7 @@ cmd:option('-start_epoch', 0, 'learning rate decays to the minLearningRate')
 cmd:option('-saturate_epoch', 30, 'learning rate decays to the minLearningRate')
 cmd:option('-batch_size', 32, 'the size of mini-batch')
 cmd:option('-src_seq_len', 52, 'the maximum length of source sequences')
-cmd:option('-tgt_seq_len', 25, 'the maximum length of target sequences')
+cmd:option('-tgt_seq_len', 52, 'the maximum length of target sequences')
 cmd:option('-grad_clip', 5, 'clip gradients at this value')
 cmd:option('-nepoch', 40, 'the maximum of epoches')
 -- bookkeeping
@@ -72,8 +72,6 @@ local tgt_dict = assert(torch.load(paths.concat(opt.data, opt.tgt_dict)))
 opt.src_vocab = #src_dict.i2w
 opt.tgt_vocab = #tgt_dict.i2w 
 opt.src_pos = 200
-opt.src_dict = src_dict
-opt.tgt_dict = tgt_dict
 
 -- load datasets
 local train = DataLoader({
