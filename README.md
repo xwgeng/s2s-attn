@@ -62,7 +62,7 @@ sh nmt-eval.sh 'identifier'
 * `seed`: torch manual random number generator seed.
 
 #### training options(`main.lua`)
-** Data options **
+**Data options**
 
 * `data`: path to the training data, which is output of `data_prep.lua`
 * `src_dict, tgt_dict`: the dictionaries of source and target sequences
@@ -71,7 +71,7 @@ sh nmt-eval.sh 'identifier'
 * `shuff`: If `true`, shuff the sequences
 * `curriculum`: the number of epochs at which perform curriculum learning. And the input is sorted by length 
 
-** Model options **
+**Model options**
 
 * `model`: If not empty, load the pre-train model with this name
 * `emb`: the dimension of word embeddings
@@ -82,7 +82,7 @@ sh nmt-eval.sh 'identifier'
 * `attn_net`: the name of attention network(`conv` | `mlp`). use convolutional attentive encoder with option `conv`, and multi-layer perception with option `mlp`
 * `pool`: the pool size of attention convolutional encoder
 
-** Optimization options **
+**Optimization options**
 
 * `optim`: the name of optimization algorithm
 * `dropout`: the dropout rate
@@ -98,7 +98,7 @@ sh nmt-eval.sh 'identifier'
 * `grad_clip`: clip the gradients which is bigger than this value
 * `npeoch`: the maximum of epochs 
 
-** Other options **
+**Other options**
 
 * `save`: the path to save the model.
 * `name`: the identifier of the training models. And it is sub-string of the name of models
