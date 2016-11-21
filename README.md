@@ -107,4 +107,32 @@ sh nmt-eval.sh 'identifier'
 * `gpu`: the ID of gpu to use
 * `nprint`: the frequency of print the information
 
+#### evaluate options(`evaluate.lua`)
+**Data Options**
 
+* `data`: the path to testing datasets
+* `src_dict, tgt_dict`: the dictionaries of source and target sequences
+* `thresh`: the minimum tokens of target sequences at same length. If less than this value, don't use these sequence to train model
+* `reverse`: If `true`, reverse the source sequences
+
+**Model options**
+
+* `model`: the name of model to test
+
+**Search options**
+
+* `search`: the serach stategy(`beam` | `greedy`)
+* `batch_size`: the size of min-batch if `search` options is`greedy`
+* `beam_size`: the size of beam if `search` option is `beam`
+* `src_seq_len, tgt_seq_len`: the minimum length of source/target sequences, and the sequences whose length is bigger than this length, truncate
+* `strategy`: If `true`, the prediction is simply the top sequence of beam with an `<EOS>` tail token at the fist time. Otherwise, the model considers all sequences that have been generated so far that end with `<EOS>` token and takes the top sequences
+* `nbest`: If `true`, output the n-best list, if `search` option is `beam`
+
+**Other options**
+
+* `save`: the path to save the model
+* `output`: the path save the predicions of the model
+* `seed`: torch manual random number generator seed
+* `cuda`: If `true`, use cuda
+* `gpu`: the ID of gpu to use
+* `nprint`: the frequency of print the information
