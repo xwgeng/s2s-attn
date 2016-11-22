@@ -27,7 +27,7 @@ cmd:option('-beam_size', 5, 'the beam size')
 cmd:option('-src_seq_len', 200, 'maximum sequence length to be generated')
 cmd:option('-tgt_seq_len', 200, 'maximum sequence length to be generated')
 cmd:option('-strategy', true, 'whether or not select the best sequence with eos')
-cmd:option('-nbest', true, 'whether or not output the n best list')
+cmd:option('-nbest', false, 'whether or not output the n best list')
 -- bookkeeping
 cmd:option('-save', 'backup/nmt', 'path to save the model')
 cmd:option('-output', 'output/nmt', 'path to save the output')

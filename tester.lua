@@ -79,7 +79,8 @@ function Tester:test(test, opt)
 	fbest:close()
 	if fnbest then fnbest:close() end
 
-	print(string.format('=>best output = %s, nbest output = %s', path, npath)) 
+	print(string.format('=>best output = %s', path))
+	print(string.format('=>nbest output = %s', npath))
 
 	return score, nbOfwords
 end
