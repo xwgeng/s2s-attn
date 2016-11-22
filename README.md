@@ -1,7 +1,7 @@
 ## Sequece-to-Sequence Model with attention
 
 Sequence-to-sequence model with attention implemented by [Torch](http://torch.ch).
-The encoder can be bidirectional recurrent neural network(LSTM | GRU | RNN). Additionally, the convolutional attentive encoder([Rush et al.](https://www.aclweb.org/anthology/D/D15/D15-1044.pdf)) is also provided, inspired by [Bahdanau et al.](https://arxiv.org/pdf/1409.0473v7.pdf) 
+The encoder can be bidirectional recurrent neural network(LSTM | GRU | RNN). Additionally, the convolutional attentive encoder([Rush et al.](https://www.aclweb.org/anthology/D/D15/D15-1044.pdf)) inspired by [Bahdanau et al.](https://arxiv.org/pdf/1409.0473v7.pdf) is provided.
 
 ### Dependencies
 
@@ -77,9 +77,9 @@ sh nmt-eval.sh 'identifier'
 * `emb`: the dimension of word embeddings
 * `enc_rnn_size`: the size of recurrent hidden states in encoder
 * `dec_rnn_size`: the size of recurrent hidden states in decoder
-* `rnn`: the name of recurrent unit(`LSTM` | `GRU` | `RNN`)
+* `rnn`: the name of recurrent unit('LSTM' | 'GRU' | 'RNN')
 * `nlayer`: the number of layers in the recurrent encoder and decoder
-* `attn_net`: the name of attention network(`conv` | `mlp`). use convolutional attentive encoder with option `conv`, and multi-layer perception with option `mlp`
+* `attn_net`: the name of attention network('conv' | 'mlp'). use convolutional attentive encoder with option 'conv', and multi-layer perception with option 'mlp'
 * `pool`: the pool size of attention convolutional encoder
 
 **Optimization options**
@@ -121,12 +121,12 @@ sh nmt-eval.sh 'identifier'
 
 **Search options**
 
-* `search`: the serach stategy(`beam` | `greedy`)
-* `batch_size`: the size of min-batch if `search` options is`greedy`
-* `beam_size`: the size of beam if `search` option is `beam`
+* `search`: the serach strategy('beam' | 'greedy')
+* `batch_size`: the size of min-batch if `search` options is 'greedy'
+* `beam_size`: the size of beam if `search` option is 'beam'
 * `src_seq_len, tgt_seq_len`: the minimum length of source/target sequences, and the sequences whose length is bigger than this length, truncate
 * `strategy`: If `true`, the prediction is simply the top sequence of beam with an `<EOS>` tail token at the fist time. Otherwise, the model considers all sequences that have been generated so far that end with `<EOS>` token and takes the top sequences
-* `nbest`: If `true`, output the n-best list, if `search` option is `beam`
+* `nbest`: If `true`, output the n-best list, if `search` option is 'beam'
 
 **Other options**
 
