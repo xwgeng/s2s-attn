@@ -46,9 +46,9 @@ This will run the model, which uses convolutional attentive encoder and a 1-laye
 th evaluate.lua -search 'greedy' -batch_size 32
 ```
 
-* I use the `muti-bleu.perl` script from Moses to compute the BLEU. Given the *identifier* of model, just run as follows:
+* I use the `muti-bleu.perl` script from Moses to compute the BLEU. Given the *identifier* of model and *gpuid*, just run as follows:
 ```
-sh nmt-eval.sh *identifier*
+sh nmt-eval.sh identifier gpuid
 ```
 
 ### Details
