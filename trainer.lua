@@ -85,7 +85,6 @@ function Trainer:run(train, valid, opt)
 	local tLosses = {}
 	local vLosses = {}
 
-	local lr = opt.learningRate
 	local shrink_factor = opt.shrink_factor
 	local shrink_multiplier = opt.shrink_multiplier
 
