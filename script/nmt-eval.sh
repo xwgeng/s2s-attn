@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-export CUDA_VISIBLE_DEVICES=${2:=0}
+export CUDA_VISIBLE_DEVICES=${2:-0}
 
 evaluate=evaluate.lua
 search=greedy
