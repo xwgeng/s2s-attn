@@ -77,9 +77,9 @@ sh nmt-eval.sh 'identifier'
 * `emb`: the dimension of word embeddings
 * `enc_rnn_size`: the size of recurrent hidden states in encoder
 * `dec_rnn_size`: the size of recurrent hidden states in decoder
-* `rnn`: the name of recurrent unit('LSTM' | 'GRU' | 'RNN')
+* `rnn`: the name of recurrent unit(`LSTM` | `GRU` | `RNN`)
 * `nlayer`: the number of layers in the recurrent encoder and decoder
-* `attn_net`: the name of attention network('conv' | 'mlp'). use convolutional attentive encoder with option 'conv', and multi-layer perception with option 'mlp'
+* `attn_net`: the name of attention network(`conv` | `mlp`). use convolutional attentive encoder with option `conv`, and multi-layer perception with option `mlp`
 * `pool`: the pool size of attention convolutional encoder
 
 **Optimization options**
