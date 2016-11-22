@@ -53,8 +53,10 @@ function models.decoder_lstm_attn(opt)
 						:annotate{name = 'i2h_' .. L}
 		local h2h = nn.Linear(opt.dec_rnn_size, 4 * opt.dec_rnn_size)(prev_h)
 						:annotate{name = 'h2h_' .. L}
-		local c2h = nn.Linear(opt.enc_rnn_size, 4 * opt.dec_rnn_size)(attn)
-						:annotate{name = 'c2h_' .. L}
+
+		local c2h = (L == opt.nlayer) and
+					nn.Linear(opt.enc_rnn_size, 4 * opt.dec_rnn_size)(attn)
+						:annotate{name = 'c2h_' .. L} or nil
 
 		local all_input_sums = nn.CAddTable()(
 			L == opt.nlayer and {i2h, h2h, c2h} or {i2h, h2h}
@@ -119,11 +121,13 @@ function models.decoder_gru_attn(opt)
 
 	function new_input_sum(insize, xv, hv, L)
 		local i2h = nn.Linear(insize, opt.dec_rnn_size)(xv)
-					:annotate{name = 'i2h_' .. L}
+						:annotate{name = 'i2h_' .. L}
 		local h2h = nn.Linear(opt.dec_rnn_size, opt.dec_rnn_size)(hv)
-					:annotate{name = 'h2h_' .. L}
-		local c2h = nn.Linear(opt.dec_rnn_size, opt.dec_rnn_size)(attn)
-					:annotate{naem = 'c2h_' .. L}
+						:annotate{name = 'h2h_' .. L}
+		local c2h = (L == opt.nlayer) and 
+					nn.Linear(opt.dec_rnn_size, opt.dec_rnn_size)(attn)
+						:annotate{name = 'c2h_' .. L} or nil
+
 		return nn.CAddTable()(L == opt.nlayer and {i2h, h2h, c2h} or {i2h, h2h})
 	end
 
