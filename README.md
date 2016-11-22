@@ -50,6 +50,7 @@ th evaluate.lua -search 'greedy' -batch_size 32
 ```
 sh nmt-eval.sh identifier gpuid
 ```
+Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so the predicitons doesn't match raw source text. In addition to the predictions, add line number of source sequence in raw text. Before computing the BLEU, leverage the line number to sort the predictions, making the predicitones match the golden sequences.
 
 ### Details
 
