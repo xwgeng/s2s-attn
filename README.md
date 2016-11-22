@@ -48,7 +48,7 @@ th evaluate.lua -search 'greedy' -batch_size 32
 
 * I use the `muti-bleu.perl` script from Moses to compute the BLEU. Given the *identifier* of model, just run as follows:
 ```
-sh nmt-eval.sh 'identifier'
+sh nmt-eval.sh *identifier*
 ```
 
 ### Details
@@ -101,7 +101,7 @@ sh nmt-eval.sh 'identifier'
 **Other options**
 
 * `save`: the path to save the model.
-* `name`: the identifier of the training models. And it is sub-string of the name of models
+* `name`: the identifier of the training models. And it is substring of the name of models
 * `seed`: torch manual random number generator seed
 * `cuda`: If `true`, use cuda
 * `gpu`: the ID of gpu to use
