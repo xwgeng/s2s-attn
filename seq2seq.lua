@@ -154,7 +154,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		enc_reps = enc_lookup:forward({src, pos})
 		
 		local context = {}
-		if self.clones.frnn then
+		if self.clones.encoder.frnn then
 			for t = 1, src_len do
 				local frnn = self.clones.encoder.frnn[t]		
 				local brnn = self.clones.encoder.brnn[t]		
@@ -191,11 +191,12 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		else
 			context = enc_reps
 		end
+
 		context = context:transpose(1, 2):contiguous()
 
 		-- decoder
 		local dec_rnn_state = {[0] = clone_list(init_state)}
-		if self.clones.frnn then
+		if self.clones.clones.frnn then
 			local concat_last = self.clones.encoder.concat_last
 			concat_last:training()
 			dec_rnn_state[0] = concat_last:forward(
@@ -256,7 +257,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		-- encoder
 		local enc_dfrnn_state = {[src_len] = clone_list(init_state)}	
 		local enc_dbrnn_state = {[src_len] = clone_list(init_state)}
-		if self.clones.frnn then
+		if self.clones.encoder.frnn then
 			local concat_last = self.clones.encoder.concat_last
 			enc_dfrnn_state[src_len], enc_dbrnn_state[src_len] = 
 				concat_last:backward(
@@ -268,7 +269,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		dcontext = dcontext:transpose(1, 2):contiguous()
 
 		local enc_dreps  = {}
-		if self.clones.frnn then
+		if self.clones.encoder.frnn then
 			local concat_h = self.clones.encoder.concat_h
 			local enc_dfrnn_output, enc_dbrnn_output = concat:backward(
 				{enc_frnn_output, enc_brnn_out}, dcontext
@@ -332,7 +333,7 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 	enc_reps = enc_lookup:forward({src, pos})
 
 	local context = {}
-	if self.clones.frnn then
+	if self.clones.encoder.frnn then
 		for t = 1, src_len do
 			local frnn = self.clones.encoder.frnn[t]		
 			local brnn = self.clones.encoder.brnn[t]		
@@ -372,7 +373,7 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 
 	-- decoder
 	local dec_rnn_state = {[0] = clone_list(init_state)}
-	if self.clones.frnn then
+	if self.clones.encoder.frnn then
 		local concat_last = self.clones.encoder.concat_last
 		concat_last:evaluate()
 		dec_rnn_state[0] = concat_last:forward(
@@ -426,7 +427,7 @@ function Seq2seq:test(src, pos)
 	enc_reps = enc_lookup:forward({src, pos})
 
 	local context = {}
-	if self.clones.frnn then
+	if self.clones.encoder.frnn then
 		for t = 1, src_len do
 			local frnn = self.clones.encoder.frnn[t]		
 			local brnn = self.clones.encoder.brnn[t]		
@@ -468,7 +469,7 @@ function Seq2seq:test(src, pos)
 
 	-- generator
 	local dec_rnn_state = clone_list(init_state)
-	if self.clones.frnn then
+	if self.clones.encoder.frnn then
 		local concat_last = self.clones.encoder.concat_last
 		concat_last:evaluate()
 		dec_rnn_state = concat_last:forward(
