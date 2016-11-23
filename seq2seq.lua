@@ -37,7 +37,7 @@ function Seq2seq:__init(opt, encoder, decoder)
 	print('the number of parameters is ' .. self.params:size(1))
 
 	self:initialize_net(opt)
-	self.init_state = self:initialize_state(opt)
+	self.enc_init_state, self.dec_init_state = self:initialize_state(opt)
 end
 
 function Seq2seq:initialize_net(opt)
@@ -68,17 +68,27 @@ function Seq2seq:initialize_net(opt)
 end
 
 function Seq2seq:initialize_state(opt)
-	local init_state = {}
+	local enc_init_state = {}
 	for L = 1, opt.nlayer do
 		local h_init = torch.zeros(opt.batch_size, opt.enc_rnn_size)
 		if opt.cuda then h_init = h_init:cuda() end
-		table.insert(init_state, h_init:clone())
+		table.insert(enc_init_state, h_init:clone())
 		if opt.rnn == 'lstm' then
-			table.insert(init_state, h_init:clone())
+			table.insert(enc_init_state, h_init:clone())
 		end
 	end
 
-	return init_state
+	local dec_init_state = {}
+	for L = 1, opt.nlayer do
+		local h_init = torch.zeros(opt.batch_size, opt.dec_rnn_size)
+		if opt.cuda then h_init = h_init:cuda() end
+		table.insert(dec_init_state, h_init:clone())
+		if opt.rnn == 'lstm' then
+			table.insert(dec_init_state, h_init:clone())
+		end
+	end
+
+	return enc_init_state, dec_init_state
 end
 
 function Seq2seq:create_networks(opt)
@@ -125,11 +135,16 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		local tgt_len = tgt:size(1)
 		local batch_size = src:size(2)
 
-		local init_state = clone_list(self.init_state)
+		local enc_init_state = clone_list(self.enc_init_state)
+		local dec_init_state = clone_list(self.dec_init_state)
 		if batch_size ~= self.batch_size then
 			tablex.transform(
 				function(v) return v:resize(batch_size, v:size(2)):zero() end,
-				init_state
+				enc_init_state
+			)
+			tablex.transform(
+				function(v) return v:resize(batch_size, v:size(2)):zero() end,
+				dec_init_state
 			)
 		end
 
@@ -138,8 +153,8 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		-- forward pass
 
 		-- encoder
-		local enc_frnn_state = {[0] = clone_list(init_state)}
-		local enc_brnn_state = {[0] = clone_list(init_state)}
+		local enc_frnn_state = {[0] = clone_list(enc_init_state)}
+		local enc_brnn_state = {[0] = clone_list(enc_init_state)}
 		local enc_frnn_output = nil
 		local enc_brnn_output = nil
 
@@ -191,7 +206,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		context = context:transpose(1, 2):contiguous()
 
 		-- decoder
-		local dec_rnn_state = {[0] = clone_list(init_state)}
+		local dec_rnn_state = {[0] = clone_list(dec_init_state)}
 		if self.clones.encoder.frnn and
 			opt.enc_rnn_size == opt.dec_rnn_size then
 			dec_rnn_state[0] = tablex.imap2(
@@ -221,7 +236,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		-- backward pass
 		
 		-- decoder
-		local dec_drnn_state = {[tgt_len] = clone_list(init_state)}
+		local dec_drnn_state = {[tgt_len] = clone_list(dec_init_state)}
 		local dcontext = {}
 		local dec_dreps = {}
 
@@ -250,8 +265,8 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		dec_lookup:backward(tgt, dec_dreps)
 
 		-- encoder
-		local enc_dfrnn_state = {[src_len] = clone_list(init_state)}	
-		local enc_dbrnn_state = {[src_len] = clone_list(init_state)}
+		local enc_dfrnn_state = {[src_len] = clone_list(enc_init_state)}	
+		local enc_dbrnn_state = {[src_len] = clone_list(enc_init_state)}
 		if self.clones.encoder.frnn and 
 			opt.enc_rnn_size == opt.dec_rnn_size then
 			enc_dfrnn_state[src_len] = clone_list(dec_drnn_state[0])
@@ -304,19 +319,24 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 	local tgt_len = tgt:size(1)
 	local batch_size = src:size(2)
 
-	local init_state = clone_list(self.init_state)
+	local enc_init_state = clone_list(self.enc_init_state)
+	local dec_init_state = clone_list(self.dec_init_state)
 	if batch_size ~= self.batch_size then
 		tablex.transform(
 			function(v) return v:resize(batch_size, v:size(2)):zero() end,
-			init_state
+			enc_init_state
+		)
+		tablex.transform(
+			function(v) return v:resize(batch_size, v:size(2)):zero() end,
+			dec_init_state
 		)
 	end
 
 	local loss = 0
 
 	-- encoder
-	local enc_frnn_state = {[0] = clone_list(init_state)}
-	local enc_brnn_state = {[0] = clone_list(init_state)}
+	local enc_frnn_state = {[0] = clone_list(enc_init_state)}
+	local enc_brnn_state = {[0] = clone_list(enc_init_state)}
 	local enc_frnn_output = nil
 	local enc_frnn_output = nil
 
@@ -366,7 +386,7 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 	context = context:transpose(1, 2):contiguous()
 
 	-- decoder
-	local dec_rnn_state = {[0] = clone_list(init_state)}
+	local dec_rnn_state = {[0] = clone_list(dec_init_state)}
 	if self.clones.encoder.frnn and
 		opt.enc_rnn_size == opt.dec_rnn_size then
 		dec_rnn_state[0] = tablex.imap2(
@@ -399,19 +419,24 @@ function Seq2seq:test(src, pos)
 	local src_len = src:size(1)
 	local batch_size = src:size(2)
 
-	local init_state = clone_list(self.init_state)
+	local enc_init_state = clone_list(self.enc_init_state)
+	local dec_init_state = clone_list(self.dec_init_state)
 	if batch_size ~= self.batch_size then
 		tablex.transform(
 			function(v) return v:resize(batch_size, v:size(2)):zero() end,
-			init_state
+			enc_init_state
+		)
+		tablex.transform(
+			function(v) return v:resize(batch_size, v:size(2)):zero() end,
+			dec_init_state
 		)
 	end
 
 	local loss = 0
 
 	-- encoder
-	local enc_frnn_state = {[0] = clone_list(init_state)}
-	local enc_brnn_state = {[0] = clone_list(init_state)}
+	local enc_frnn_state = {[0] = clone_list(enc_init_state)}
+	local enc_brnn_state = {[0] = clone_list(enc_init_state)}
 	local enc_frnn_output = nil
 	local enc_brnn_output = nil
 
@@ -465,7 +490,7 @@ function Seq2seq:test(src, pos)
 	context = context:transpose(1, 2):contiguous()
 
 	-- generator
-	local dec_rnn_state = clone_list(init_state)
+	local dec_rnn_state = clone_list(dec_init_state)
 	if self.clones.encoder.frnn and
 		opt.enc_rnn_size == opt.dec_rnn_size then
 		local concat_last = self.clones.encoder.concat_last
