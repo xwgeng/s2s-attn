@@ -1,5 +1,3 @@
-local nninit = require 'nninit'
-
 local tablex = require 'pl.tablex'
 local stringx = require 'pl.stringx'
 
