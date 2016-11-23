@@ -1,7 +1,6 @@
 ## Sequece-to-Sequence Model with attention
 
-Sequence-to-sequence model with attention implemented by [Torch](http://torch.ch).
-The encoder can be bidirectional recurrent neural network(LSTM | GRU | RNN). Additionally, the convolutional attentive encoder([Rush et al.](https://www.aclweb.org/anthology/D/D15/D15-1044.pdf)) inspired by [Bahdanau et al.](https://arxiv.org/pdf/1409.0473v7.pdf) is provided.
+Sequence-to-sequence model with attention implemented by [Torch](http://torch.ch).The convolutional attentive encoder([Rush et al.](https://www.aclweb.org/anthology/D/D15/D15-1044.pdf)) inspired by [Bahdanau et al.](https://arxiv.org/pdf/1409.0473v7.pdf) is provided. Additionally, the encoder can be bidirectional recurrent neural network(LSTM | GRU | RNN). 
 
 ### Dependencies
 
