@@ -34,7 +34,7 @@ function Trainer:train(epoch, train, opt)
 		for j = 1, nbOfbatch do
 			timer:reset()
 			local feval = self.model:trainb(opt, unpack(shard[j]))
-			local _, loss = optim[opt.optim](feval, self.params, opt.optim_config)
+			local _, loss = optim[opt.optim](feval, self.params,self.optim_config)
 			tLoss[#tLoss + 1] = loss[1] * lOfbatch[j] / nbOfnonzero[j]
 			tIter = tIter + 1
 			if tIter % opt.nprint == 0 then
@@ -94,9 +94,11 @@ function Trainer:run(train, valid, opt)
 
 	local timer = torch.Timer()
 
+	self.optim_config = {learningRate = opt.learningRate}
+
 	for i = 1, opt.nepoch do
 		timer:reset()
-		local lr = opt.optim_config.learningRate
+		local lr = self.optim_config.learningRate
 		local tLoss = self:train(i, train, opt)
 		print(string.format(
 			'=>[epoch %d] training loss = %6.4e, lr = %.4f, time = %.4fs',
@@ -127,13 +129,13 @@ function Trainer:run(train, valid, opt)
 		then
 			lr = lr / opt.shrink_factor
 			lr = math.max(lr, opt.minLearningRate)
-			opt.optim_config.learningRate = lr
+			self.optim_config.learningRate = lr
 		end
 
 		if opt.anneal and i > opt.start_epoch then
 			lr = lr - (opt.learningRate - opt.minLearningRate) / opt.saturate_epoch
 			lr = math.max(lr, opt.minLearningRate)
-			opt.optim_config.learningRate = lr
+			self.optim_config.learningRate = lr
 		end
 
 		tLosses[#tLosses + 1] = tLoss

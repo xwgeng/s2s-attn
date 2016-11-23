@@ -290,7 +290,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 				enc_dbrnn_state[t - 1] = brnn:backward(
 					{enc_reps[src_len - t + 1], unpack(enc_brnn_state[t - 1])},
 					#enc_dbrnn_state[t] == 1 and
-					enc_dbrnn_state[t][1] or enc_dbrnn_state[t]
+						enc_dbrnn_state[t][1] or enc_dbrnn_state[t]
 				)
 
 				local dfrep = table.remove(enc_dfrnn_state[t - 1], 1)  

@@ -110,9 +110,6 @@ else
 	model = Seq2seq(opt)
 end
 
-opt.optim_config = {}
-opt.optim_config.learningRate = opt.learningRate	
-
 -- create trainer
 local trainer = Trainer(model)
 
