@@ -44,8 +44,7 @@ function Seq2seq:initialize_net(opt)
 	self.clones = {}
 	self.clones.encoder = {}	
 	for name, proto in pairs(self.encoder) do
-		if name ~= 'lookup' and 
-			not stringx.startswith(name, 'concat') then
+		if name ~= 'lookup' then
 			print('cloning encoder ' .. name)
 			self.clones.encoder[name] = model_utils.clone_many_times(
 				proto, opt.src_seq_len, not proto.parameters
@@ -107,11 +106,6 @@ function Seq2seq:create_networks(opt)
 	
 	decoder.criterion = nn.ClassNLLCriterion()
 	
-	encoder.concat_h = nn.JoinTable(3)
-	encoder.concat_last = nn.Sequential()
-		:add(nn.MapTable():add(nn.JoinTable(1)))
-		:add(nn.JoinTable(2))
-		:add(nn.SplitTable(1))
 	if opt.cuda then
 		for k, v in pairs(encoder) do v:cuda() end
 		for k, v in pairs(decoder) do v:cuda() end
@@ -166,6 +160,10 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 				enc_brnn_state[t] = brnn:forward(
 					{enc_reps[src_len - t + 1], unpack(enc_brnn_state[t - 1])}
 				)
+				if type(enc_frnn_state[t]) ~= 'table' then
+					enc_frnn_state[t] = {enc_frnn_state[t]}
+					enc_brnn_state[t] = {enc_brnn_state[t]}
+				end
 			end
 			enc_frnn_output = tablex.imap(
 				function(v) 
@@ -185,9 +183,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 			enc_brnn_output = enc_brnn_output:index(
 				1, torch.range(src_len, 1, -1):long()
 			)
-			local concat_h = self.clones.encoder.concat_h
-			concat_h:training()
-			context = concat_h:forward({enc_frnn_output, enc_brnn_output})
+			context = torch.add(enc_frnn_output, enc_brnn_output)
 		else
 			context = enc_reps
 		end
@@ -196,11 +192,10 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 
 		-- decoder
 		local dec_rnn_state = {[0] = clone_list(init_state)}
-		if self.clones.clones.frnn then
-			local concat_last = self.clones.encoder.concat_last
-			concat_last:training()
-			dec_rnn_state[0] = concat_last:forward(
-				{enc_frnn_state[src_len], enc_brnn_state[src_len]}
+		if self.clones.encoder.frnn and
+			opt.enc_rnn_size == opt.dec_rnn_size then
+			dec_rnn_state[0] = tablex.imap2(
+				torch.add, enc_frnn_state[src_len], enc_brnn_state[src_len]
 			)
 		end
 		
@@ -257,44 +252,41 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 		-- encoder
 		local enc_dfrnn_state = {[src_len] = clone_list(init_state)}	
 		local enc_dbrnn_state = {[src_len] = clone_list(init_state)}
-		if self.clones.encoder.frnn then
-			local concat_last = self.clones.encoder.concat_last
-			enc_dfrnn_state[src_len], enc_dbrnn_state[src_len] = 
-				concat_last:backward(
-					{enc_frnn_state[src_len], enc_brnn_state[src_len]},
-					dec_drnn_state[0]
-				)
+		if self.clones.encoder.frnn and 
+			opt.enc_rnn_size == opt.dec_rnn_size then
+			enc_dfrnn_state[src_len] = clone_list(dec_drnn_state[0])
+			enc_dbrnn_state[src_len] = clone_list(dec_drnn_state[0])
 		end
 		
 		dcontext = dcontext:transpose(1, 2):contiguous()
 
 		local enc_dreps  = {}
 		if self.clones.encoder.frnn then
-			local concat_h = self.clones.encoder.concat_h
-			local enc_dfrnn_output, enc_dbrnn_output = concat:backward(
-				{enc_frnn_output, enc_brnn_out}, dcontext
-			)
 			for t = src_len, 1, -1 do
 				local frnn = self.clones.encoder.frnn[t]	
 				local brnn = self.clones.encoder.brnn[t]	
+				enc_dfrnn_state[t][#enc_dfrnn_state[t]]:add(dcontext[t])
+				enc_dbrnn_state[t][#enc_dbrnn_state[t]]:add(dcontext[src_len-t+1])
 				enc_dfrnn_state[t - 1] = frnn:backward(
 					{enc_reps[t], unpack(enc_frnn_state[t - 1])},
-					enc_dfrnn_output[t]
+					#enc_dfrnn_state[t] == 1 and 
+						enc_dfrnn_state[t][1] or enc_dfrnn_state[t]
 				)
 				enc_dbrnn_state[t - 1] = brnn:backward(
 					{enc_reps[src_len - t + 1], unpack(enc_brnn_state[t - 1])},
-					enc_dbrnn_output[src - t + 1]
+					#enc_dbrnn_state[t] == 1 and
+					enc_dbrnn_state[t][1] or enc_dbrnn_state[t]
 				)
 
 				local dfrep = table.remove(enc_dfrnn_state[t - 1], 1)  
 				local dbrep = table.remove(enc_dbrnn_state[t - 1], 1)
-				dfrep = dfrep:view(1, unpack(dfrep:size()))
-				dbrep = dbrep:view(1, unpack(dbrep:size()))
-				enc_dreps[t] = enc_dreps[t] and enc_dreps[t]:add(dfrep) or dfrep	
+				dfrep = dfrep:view(1, unpack(dfrep:size():totable()))
+				dbrep = dbrep:view(1, unpack(dbrep:size():totable()))
+				enc_dreps[t] = enc_dreps[t] and enc_dreps[t]:add(dfrep) or dfrep
 				enc_dreps[src_len - t + 1] = enc_dreps[src_len - t + 1] and
 					enc_dreps[src_len - t + 1]:add(dbrep) or dbrep
 			end
-			enc_dreps = torch.cat(1, enc_dreps)
+			enc_dreps = torch.cat(enc_dreps, 1)
 		else
 			enc_dreps = dcontext
 		end
@@ -345,6 +337,10 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 			enc_brnn_state[t] = brnn:forward(
 				{enc_reps[src_len - t + 1], unpack(enc_brnn_state[t - 1])}
 			)
+			if type(enc_frnn_state[t]) ~= 'table' then
+				enc_frnn_state[t] = {enc_frnn_state[t]}
+				enc_brnn_state[t] = {enc_brnn_state[t]}
+			end
 		end
 		enc_frnn_output = tablex.imap(
 			function(v)
@@ -363,9 +359,7 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 		enc_brnn_output = enc_brnn_output:index(
 			1, torch.range(src_len, 1, -1):long()
 		)
-		local concat_h = self.clones.encoder.concat_h
-		concat_h:evaluate()
-		context = concat_h:forward({enc_frnn_output, enc_brnn_output})
+		context = torch.add(enc_frnn_output, enc_brnn_output)
 	else
 		context = enc_reps
 	end
@@ -373,11 +367,10 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 
 	-- decoder
 	local dec_rnn_state = {[0] = clone_list(init_state)}
-	if self.clones.encoder.frnn then
-		local concat_last = self.clones.encoder.concat_last
-		concat_last:evaluate()
-		dec_rnn_state[0] = concat_last:forward(
-			{enc_frnn_state[src_len], enc_brnn_state[src_len]}
+	if self.clones.encoder.frnn and
+		opt.enc_rnn_size == opt.dec_rnn_size then
+		dec_rnn_state[0] = tablex.imap2(
+			torch.add, enc_frnn_state[src_len], enc_brnn_state[src_len]
 		)
 	end
 	
@@ -439,6 +432,10 @@ function Seq2seq:test(src, pos)
 			enc_brnn_state[t] = brnn:forward(
 				{enc_reps[src_len - t + 1], unpack(enc_brnn_state[t - 1])}
 			)
+			if type(enc_frnn_state[t]) ~= 'table' then
+				enc_frnn_state[t] = {enc_frnn_state[t]}
+				enc_brnn_state[t] = {enc_brnn_state[t]}
+			end
 		end
 		enc_frnn_output = tablex.imap(
 			function(v)
@@ -469,7 +466,8 @@ function Seq2seq:test(src, pos)
 
 	-- generator
 	local dec_rnn_state = clone_list(init_state)
-	if self.clones.encoder.frnn then
+	if self.clones.encoder.frnn and
+		opt.enc_rnn_size == opt.dec_rnn_size then
 		local concat_last = self.clones.encoder.concat_last
 		concat_last:evaluate()
 		dec_rnn_state = concat_last:forward(
