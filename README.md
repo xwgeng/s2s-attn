@@ -126,8 +126,8 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 * `batch_size`: the size of min-batch if `search` options is 'greedy'
 * `beam_size`: the size of beam if `search` option is 'beam'
 * `src_seq_len, tgt_seq_len`: the minimum length of source/target sequences, and the sequences whose length is bigger than this length, truncate
-* `strategy`: If `true`, the prediction is simply the top sequence of beam with an `<EOS>` tail token at the fist time. Otherwise, the model considers all sequences that have been generated so far that end with `<EOS>` token and takes the top sequences
-* `nbest`: If `true`, output the n-best list, if `search` option is 'beam'
+* `strategy`: If `true`, the prediction is simply the top sequence of beam with an `<EOS>` tail token at the first time. Otherwise, the model considers all sequences that have been generated so far that end with `<EOS>` token and takes the top sequences
+* `nbest`: If `true`, output the n-best list, when `search` option is 'beam'
 
 **Other options**
 
