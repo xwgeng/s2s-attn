@@ -88,7 +88,7 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 * `dropout`: the dropout rate
 * `learningRate`: the learning rate of optiomization algorithm
 * `minLearningRate`: the minimum of learning rate
-* `shrink_factor`: decay the learning rate by this if the loss doesn't decrease to the product of the previous loss and `shrink_muliplier`
+* `shrink_factor`: decay the learning rate by this if the loss doesn't decrease to the product of the previous loss and `shrink_muliplier`. And it only works when the option `optim` is sgd.
 * `shrink_multiplier`: the shrink multiplier
 * `anneal`: If `true`, anneal the leanring rate
 * `start_epoch`: the epoch at which start to anneal the learning rate
