@@ -10,7 +10,7 @@ Sequence-to-sequence model with attention implemented by [Torch](http://torch.ch
 
 #### Torch
 The model is implemented by [torch](http://torch.ch). It requires the following packages:
-* [torch7](https://github.com/torch/torch7)
+* [torch](https://github.com/torch/torch7)
 * [nn](https://github.com/torch/nn)
 * [nngraph](https://github.com/torch/nngraph)
 * [cutorch](https://github.com/torch/cutorch)
@@ -139,7 +139,7 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 
 #### Acknowledgements
 
-Our implements utilizes code from the following:
+My implements utilizes code from the following:
 
 * [Andrej Karpathy's char-rnn repo](https://github.com/karpathy/char-rnn)
 * [harvardnlp's seq2seq-attn repo](https://github.com/harvardnlp/seq2seq-attn)
