@@ -86,7 +86,7 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 
 * `optim`: the name of optimization algorithm
 * `dropout`: the dropout rate
-* `learningRate`: the learning rate of optiomization algorithm
+* `learningRate`: the learning rate of optimization algorithm
 * `minLearningRate`: the minimum of learning rate
 * `shrink_factor`: decay the learning rate by this if the loss doesn't decrease to the product of the previous loss and `shrink_muliplier`. And it only works when the option `optim` is sgd.
 * `shrink_multiplier`: the shrink multiplier
