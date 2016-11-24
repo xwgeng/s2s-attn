@@ -96,7 +96,7 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 * `batch_size`: the size of mini-batch
 * `src_seq_len, tgt_seq_len`: the minimum length of source/target sequences, and the sequences whose length is bigger than this length, truncate
 * `grad_clip`: clip the gradients which is bigger than this value
-* `npeoch`: the maximum of epochs 
+* `nepoch`: the maximum of epochs 
 
 **Other options**
 
