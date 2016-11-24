@@ -139,7 +139,7 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 
 #### Acknowledgements
 
-My implements utilizes code from the following:
+My implementation utilizes code from the following:
 
 * [Andrej Karpathy's char-rnn repo](https://github.com/karpathy/char-rnn)
 * [harvardnlp's seq2seq-attn repo](https://github.com/harvardnlp/seq2seq-attn)
