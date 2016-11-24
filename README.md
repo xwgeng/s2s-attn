@@ -15,7 +15,7 @@ The model is implemented by [torch](http://torch.ch). It requires the following 
 * [nngraph](https://github.com/torch/nngraph)
 * [cutorch](https://github.com/torch/cutorch)
 * [cunn](https://github.com/torch/cunn)
-* [optim](://github.com/torch/optim)
+* [optim](https://github.com/torch/optim)
 * [paths](https://github.com/torch/paths)
 
 ### Quikstart
