@@ -1,21 +1,21 @@
 ## Sequece-to-Sequence Model with attention
 
-Sequence-to-sequence model with attention implemented by [Torch](http://torch.ch).The convolutional attentive encoder([Rush et al.](https://www.aclweb.org/anthology/D/D15/D15-1044.pdf)) inspired by [Bahdanau et al.](https://arxiv.org/pdf/1409.0473v7.pdf) is provided. Additionally, the encoder can be bidirectional recurrent neural network(LSTM | GRU | RNN). 
+Sequence-to-sequence model with attention implemented by [Torch](http://torch.ch). The convolutional attentive encoder([Rush et al.](https://www.aclweb.org/anthology/D/D15/D15-1044.pdf)) inspired by [Bahdanau et al.](https://arxiv.org/pdf/1409.0473v7.pdf) is provided. Additionally, the encoder can be bidirectional recurrent neural network(LSTM | GRU | RNN). 
 
 ### Dependencies
 
 #### Lua
-* Moses
-* Penlight
+* [Moses](https://github.com/Yonaba/Moses)
+* [Penlight](https://github.com/stevedonovan/Penlight)
 
 #### Torch
 The model is implemented by [torch](http://torch.ch). It requires the following packages:
-* torch7
-* nn
-* nngraph
-* cutorch
-* cunn
-* paths
+* [torch7](https://github.com/torch/torch7)
+* [nn](https://github.com/torch/nn)
+* [nngraph](https://github.com/torch/nngraph)
+* [cutorch](https://github.com/torch/cutorch)
+* [cunn](https://github.com/torch/cunn)
+* [paths](https://github.com/torch/paths)
 
 ### Quikstart
 
@@ -136,3 +136,11 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 * `cuda`: If `true`, use cuda
 * `gpu`: the ID of gpu to use
 * `nprint`: the frequency of print the information
+
+#### Acknowledgements
+
+Our implements utilizes code from the following:
+
+* [Andrej Karpathy's char-rnn repo](https://github.com/karpathy/char-rnn)
+* [harvardnlp's seq2seq-attn repo](https://github.com/harvardnlp/seq2seq-attn)
+* [facebook research's Mixer repo](https://github.com/facebookresearch/MIXER)
