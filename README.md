@@ -138,7 +138,7 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 * `gpu`: the ID of gpu to use
 * `nprint`: the frequency of print the information
 
-#### Acknowledgements
+### Acknowledgements
 
 My implementation utilizes code from the following:
 
