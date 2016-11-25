@@ -95,7 +95,7 @@ Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so t
 * `start_epoch`: the epoch at which start to anneal the learning rate
 * `saturate_epoch`: the number of epoch after which learning rate anneals to `minLearningRate` from `start_epoch`
 * `batch_size`: the size of mini-batch
-* `src_seq_len, tgt_seq_len`: the minimum length of source/target sequences, and the sequences whose length is bigger than this length, truncate
+* `src_seq_len, tgt_seq_len`: the minimum length of source/target sequences, and truncate the sequences whose length is bigger than this length
 * `grad_clip`: clip the gradients which is bigger than this value
 * `nepoch`: the maximum of epochs 
 
