@@ -37,7 +37,8 @@ Now, start to train the model
 ```
 th main.lua -learningRate 0.001 -optim 'adam' -dropout 0.2 -rnn 'lstm'
 ```
-This will run the model, which uses convolutional attentive encoder and a 1-layer GRU decoder with 256 hidden units.
+This will run the model, which uses convolutional attentive encoder and a 1-layer LSTM decoder with 256 hidden units. And the BLEU curves on test dataset is as below.
+
 ![](BLEU.png)
 
 #### evaluate
