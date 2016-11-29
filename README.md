@@ -37,9 +37,7 @@ Now, start to train the model
 ```
 th main.lua -learningRate 0.001 -optim 'adam' -dropout 0.2 -rnn 'lstm'
 ```
-This will run the model, which uses convolutional attentive encoder and a 1-layer LSTM decoder with 256 hidden units. And the BLEU curves on test dataset is as below.
-
-![](BLEU.png)
+This will run the model, which uses convolutional attentive encoder and a 1-layer LSTM decoder with 256 hidden units. 
 
 #### evaluate
 
@@ -53,6 +51,10 @@ th evaluate.lua -search 'greedy' -batch_size 32
 sh nmt-eval.sh identifier gpuid
 ```
 Note that the testing dataset is grouped by the length with `nmt-prep.lua`, so the predicitons doesn't match raw source text. In addition to the predictions, add line number of source sequence in raw text. Before computing the BLEU, leverage the line number to sort the predictions, making the predicitions match the golden sequences.
+
+When use convolutional attentive encoder and a 1-layer LSTM decoder with 256 hidden units, the BLEU curves with greedy search on test dataset is as below. 
+
+![](BLEU.png)
 
 ### Details
 
