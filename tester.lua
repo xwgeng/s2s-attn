@@ -50,7 +50,7 @@ function Tester:test(test, opt)
 			timer:reset()
 
 			local src, tgt, lab, pos, ix = unpack(shard[j])
-			local output = self.strategy:search(src, pos)
+			local output = self.strategy:search(opt, src, pos)
 			local best_score, best_tgt, nbest_score, nbest_tgt = unpack(output)
 			local best_tgt = maker.convert_ix(best_tgt, self.tdict, true)
 			for i = 1, #best_tgt do
@@ -87,9 +87,9 @@ end
 
 function Tester:run(test, opt)
 	if opt.search == 'greedy' then
-		self.strategy = Greedy(self.model, opt)
+		self.strategy = Greedy(self.model)
 	else
-		self.strategy = Beam(self.model, opt)
+		self.strategy = Beam(self.model)
 	end
 	test:reset()
 
