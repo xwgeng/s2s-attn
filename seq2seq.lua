@@ -135,7 +135,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 
 		local enc_init_state = clone_list(self.enc_init_state)
 		local dec_init_state = clone_list(self.dec_init_state)
-		if batch_size ~= self.batch_size then
+		if batch_size ~= opt.batch_size then
 			tablex.transform(
 				function(v) return v:resize(batch_size, v:size(2)):zero() end,
 				enc_init_state
@@ -319,7 +319,7 @@ function Seq2seq:evalb(opt, src, tgt, lab, pos)
 
 	local enc_init_state = clone_list(self.enc_init_state)
 	local dec_init_state = clone_list(self.dec_init_state)
-	if batch_size ~= self.batch_size then
+	if batch_size ~= opt.batch_size then
 		tablex.transform(
 			function(v) return v:resize(batch_size, v:size(2)):zero() end,
 			enc_init_state
@@ -419,7 +419,7 @@ function Seq2seq:test(opt, src, pos)
 
 	local enc_init_state = clone_list(self.enc_init_state)
 	local dec_init_state = clone_list(self.dec_init_state)
-	if batch_size ~= self.batch_size then
+	if batch_size ~= opt.batch_size then
 		tablex.transform(
 			function(v) return v:resize(batch_size, v:size(2)):zero() end,
 			enc_init_state
