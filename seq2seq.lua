@@ -312,7 +312,7 @@ function Seq2seq:trainb(opt, src, tgt, lab, pos)
 	end
 end
 
-function Seq2seq:evalb(src, tgt, lab, pos)
+function Seq2seq:evalb(opt, src, tgt, lab, pos)
 	local src_len = src:size(1)
 	local tgt_len = tgt:size(1)
 	local batch_size = src:size(2)
@@ -413,7 +413,7 @@ function Seq2seq:evalb(src, tgt, lab, pos)
 	return loss	
 end
 
-function Seq2seq:test(src, pos)
+function Seq2seq:test(opt, src, pos)
 	local src_len = src:size(1)
 	local batch_size = src:size(2)
 

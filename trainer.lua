@@ -70,7 +70,7 @@ function Trainer:eval(epoch, valid, opt)
 		local nbOfnonzero = shard:nonzero()
 		for j = 1, nbOfbatch do
 			timer:reset()
-			local loss = self.model:evalb(unpack(shard[j]))
+			local loss = self.model:evalb(opt, unpack(shard[j]))
 			vLoss[#vLoss + 1] = loss * lOfbatch[j] / nbOfnonzero[j]
 			vIter = vIter + 1
 		end

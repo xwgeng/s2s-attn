@@ -12,7 +12,7 @@ function beam:__init(model, opt)
 	self.tgt_pad = opt.tgt_pad
 end
 
-function beam:search(src, pos)
+function beam:search(opt, src, pos)
 	local src = src:expand(src:size(1), self.beam_size) 
 	local pos = pos:expand(pos:size(1), self.beam_size)
 
@@ -22,7 +22,7 @@ function beam:search(src, pos)
 
 	local candidate_tgt, candidate_score = nil, nil
 
-	local generator = self.model:test(src, pos)
+	local generator = self.model:test(opt, src, pos)
 	local score, ix = nil, nil
 	for t = 1, self.tgt_seq_len do	
 		local pred = generator:step(tgt[t])

@@ -10,14 +10,14 @@ function greedy:__init(model, opt)
 	self.tgt_pad = opt.tgt_pad
 end
 
-function greedy:search(src, pos)
+function greedy:search(opt, src, pos)
 	local batch_size = src:size(2)
 	local tgt = torch.Tensor(self.tgt_seq_len + 1, batch_size):typeAs(src)
 	local score = torch.Tensor(batch_size):typeAs(src):zero()
 	tgt:fill(self.tgt_pad)
 	tgt[1]:fill(self.tgt_eos)
 
-	local generator = self.model:test(src, pos)
+	local generator = self.model:test(opt, src, pos)
 	local prob, ix = nil, nil
 	for t = 1, self.tgt_seq_len do	
 		local pred = generator:step(tgt[t])
