@@ -445,8 +445,8 @@ function Seq2seq:test(opt, src, pos)
 	local context = {}
 	if self.clones.encoder.frnn then
 		for t = 1, src_len do
-			local frnn = self.clones.encoder.frnn[t]		
-			local brnn = self.clones.encoder.brnn[t]		
+			local frnn = self.encoder.frnn
+			local brnn = self.encoder.brnn
 			frnn:evaluate()
 			brnn:evaluate()
 			enc_frnn_state[t] = frnn:forward(
@@ -479,9 +479,7 @@ function Seq2seq:test(opt, src, pos)
 		enc_brnn_output = enc_brnn_output:index(
 			1, torch.range(src_len, 1, -1):long()
 		)
-		local concat_h = self.clones.encoder.concat_h
-		concat_h:evaluate()
-		context = concat_h:forward({enc_frnn_output, enc_brnn_output})
+		context = torch.add(enc_frnn_output, enc_brnn_output)
 	else
 		context = enc_reps
 	end
@@ -491,10 +489,8 @@ function Seq2seq:test(opt, src, pos)
 	local dec_rnn_state = clone_list(dec_init_state)
 	if self.clones.encoder.frnn and
 		opt.enc_rnn_size == opt.dec_rnn_size then
-		local concat_last = self.clones.encoder.concat_last
-		concat_last:evaluate()
-		dec_rnn_state = concat_last:forward(
-			{enc_frnn_state[src_len], enc_brnn_state[src_len]}
+		dec_rnn_state[0] = tablex.imap2(
+			torch.add, enc_frnn_state[src_len], enc_brnn_state[src_len]
 		)
 	end
 
