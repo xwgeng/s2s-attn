@@ -81,9 +81,9 @@ function loader:next()
 		for ix = i, j do
 			local px = perm[ix]
 			local tgt_len = ((px < in_offset:nElement()) and in_offset[px + 1] 
-				or in_tgt:nElement()) - in_offset[px]
+				or (in_tgt:nElement() + 1)) - in_offset[px]
 			local lab_len = ((px < in_offset:nElement()) and in_offset[px + 1] 
-				or in_tgt:nElement()) - in_offset[px] - 1
+				or (in_tgt:nElement() + 1)) - in_offset[px] - 1
 			tgt_len = math.min(self.tgt_seq_len, tgt_len)
 			lab_len = math.min(self.tgt_seq_len, lab_len)
 			b_src:select(2, ix - i + 1):narrow(1, 1, src_len):
